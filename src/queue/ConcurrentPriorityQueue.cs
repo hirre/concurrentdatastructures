@@ -61,6 +61,22 @@ public class ConcurrentPriorityQueue<T>
     }
 
     /// <summary>
+    ///     Get queue copy.
+    /// </summary>
+    /// <param name="prio">Priority</param>
+    /// <returns>Queue copy</returns>
+    public LinkedList<T>? GetQueueCopy(int prio)
+    {
+        lock (_lock)
+        {
+            if (_queueMap.ContainsKey(prio))
+                return new LinkedList<T>(_queueMap[prio]);
+
+            return null;
+        }
+    }
+
+    /// <summary>
     ///     Enqueue item.
     /// </summary>
     /// <param name="item">Item</param>
