@@ -2,6 +2,10 @@
 
 namespace ConcurrentDataStructure;
 
+/// <summary>
+///     A concurrent FIFO priority queue.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class ConcurrentPriorityQueue<T>
 {
     private readonly object _lock = new();
@@ -22,7 +26,10 @@ public class ConcurrentPriorityQueue<T>
         _queueMap = new ConcurrentDictionary<int, ConcurrentLinkedList<T>>();
         _nrOfPriorities = nrOfPriorities;
 
-        Init();
+        for (var i = 1; i <= _nrOfPriorities; i++)
+        {
+            _queueMap.TryAdd(i, new ConcurrentLinkedList<T>());
+        }
     }
 
     /// <summary>
@@ -52,10 +59,26 @@ public class ConcurrentPriorityQueue<T>
 
                 for (var i = 1; i <= _nrOfPriorities; i++)
                 {
-                    count += _queueMap[i].Count;
+                    if (_queueMap.ContainsKey(i))
+                        count += _queueMap[i].Count;
                 }
 
                 return count;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Clear queue.
+    /// </summary>
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            for (var i = 1; i <= _nrOfPriorities; i++)
+            {
+                if (_queueMap.ContainsKey(i))
+                    _queueMap[i].Clear();
             }
         }
     }
@@ -86,21 +109,23 @@ public class ConcurrentPriorityQueue<T>
         lock (_lock)
         {
             AdjustPriority(ref priority);
-            _queueMap[priority].AddLast(item);
+
+            if (_queueMap.ContainsKey(priority))
+                _queueMap[priority].AddLast(item);
         }
     }
 
     /// <summary>
     ///     Dequeue an item.
     /// </summary>
-    /// <returns>The item (null if empty)</returns>
+    /// <returns>The item (default if empty)</returns>
     public T? Dequeue()
     {
         lock (_lock)
         {
             for (var i = 1; i <= _nrOfPriorities; i++)
             {
-                if (_queueMap[i].Count != 0)
+                if (_queueMap.ContainsKey(i) && _queueMap[i].Count != 0)
                 {
                     var node = _queueMap[i].First;
                     _queueMap[i].RemoveFirst();
@@ -110,17 +135,6 @@ public class ConcurrentPriorityQueue<T>
             }
 
             return default;
-        }
-    }
-
-    /// <summary>
-    ///     Init priority queue.
-    /// </summary>
-    private void Init()
-    {
-        for (var i = 1; i <= _nrOfPriorities; i++)
-        {
-            _queueMap.TryAdd(i, new ConcurrentLinkedList<T>());
         }
     }
 

@@ -116,6 +116,20 @@ namespace ConcurrentDataStructure.Tests
             Assert.Empty(queue.GetQueueCopy(3)); // No more prio 3 left
 
             Assert.Equal(0, queue.Count); // Queue empty
+
+            var item = queue.Dequeue(); // Empty item
+
+            Assert.Equal(default, item);
+
+            // Enqueue 3 items prio 2
+            queue.Enqueue(r.NextDouble() * 100);
+            queue.Enqueue(r.NextDouble() * 100);
+            queue.Enqueue(r.NextDouble() * 100);
+
+            queue.Clear(); // Clear queue
+
+            Assert.Equal(0, queue.Count);
+
         }
     }
 }
