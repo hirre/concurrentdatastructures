@@ -125,15 +125,15 @@ public class ConcurrentPriorityQueue<T>
     ///     Get queue copy.
     /// </summary>
     /// <param name="prio">Priority</param>
-    /// <returns>Queue copy</returns>
-    public LinkedList<T>? GetQueueCopy(int prio)
+    /// <returns>Queue copy (empty if priority not found)</returns>
+    public LinkedList<T> GetQueueCopy(int prio)
     {
         lock (_lock)
         {
             if (_queueTable.ContainsKey(prio))
                 return new LinkedList<T>(_queueTable[prio]);
 
-            return null;
+            return new LinkedList<T>();
         }
     }
 

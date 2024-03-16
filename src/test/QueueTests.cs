@@ -90,7 +90,7 @@ namespace ConcurrentDataStructures.Tests
             queue.Dequeue(); // Remove prio 1
             queue.Dequeue(); // Remove prio 1
 
-            Assert.Equal(1, queue.GetQueueCopy(1).Count); // One prio 1 left
+            Assert.Single(queue.GetQueueCopy(1)); // One prio 1 left
 
             queue.Dequeue(); // Remove prio 1
 
@@ -109,7 +109,7 @@ namespace ConcurrentDataStructures.Tests
             queue.Dequeue(); // Remove prio 3
             queue.Dequeue(); // Remove prio 3
 
-            Assert.Equal(1, queue.GetQueueCopy(3).Count); // 1 prio 3 left
+            Assert.Single(queue.GetQueueCopy(3)); // 1 prio 3 left
 
             queue.Dequeue(); // Remove prio 3
 
