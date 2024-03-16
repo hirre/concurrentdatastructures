@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\queue\concurrentdatastructures.csproj" />
+    <ProjectReference Include="..\concurrentdatastructures\concurrentdatastructures.csproj" />
   </ItemGroup>
 
   <ItemGroup>
