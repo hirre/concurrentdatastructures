@@ -10,7 +10,7 @@ public class ConcurrentPriorityQueue<T>
 {
     private readonly object _lock = new();
     private readonly int _nrOfPriorities;
-    private ConcurrentDictionary<int, ConcurrentLinkedList<T>> _queueMap;
+    private ConcurrentDictionary<int, ConcurrentLinkedList<T>> _queueTable;
 
     /// <summary>
     ///     Creates a concurrent FIFO priority queue.
@@ -23,12 +23,12 @@ public class ConcurrentPriorityQueue<T>
         else if (nrOfPriorities > 99)
             nrOfPriorities = 99;
 
-        _queueMap = new ConcurrentDictionary<int, ConcurrentLinkedList<T>>();
+        _queueTable = new ConcurrentDictionary<int, ConcurrentLinkedList<T>>();
         _nrOfPriorities = nrOfPriorities;
 
         for (var i = 1; i <= _nrOfPriorities; i++)
         {
-            _queueMap.TryAdd(i, new ConcurrentLinkedList<T>());
+            _queueTable.TryAdd(i, new ConcurrentLinkedList<T>());
         }
     }
 
@@ -59,12 +59,50 @@ public class ConcurrentPriorityQueue<T>
 
                 for (var i = 1; i <= _nrOfPriorities; i++)
                 {
-                    if (_queueMap.ContainsKey(i))
-                        count += _queueMap[i].Count;
+                    if (_queueTable.ContainsKey(i))
+                        count += _queueTable[i].Count;
                 }
 
                 return count;
             }
+        }
+    }
+
+    /// <summary>
+    ///     Remote an item from the queue.
+    /// </summary>
+    /// <param name="item">The item</param>
+    /// <returns>True on success, else false</returns>
+    public bool Remove(T item)
+    {
+        lock (_lock)
+        {
+            for (var i = 1; i <= _nrOfPriorities; i++)
+            {
+                if (_queueTable.ContainsKey(i) && _queueTable[i].Remove(item))
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    ///     Checks if queue contains item.
+    /// </summary>
+    /// <param name="item">The item</param>
+    /// <returns>True if it exists, else false</returns>
+    public bool Contains(T item)
+    {
+        lock (_lock)
+        {
+            for (var i = 1; i <= _nrOfPriorities; i++)
+            {
+                if (_queueTable.ContainsKey(i) && _queueTable[i].Contains(item))
+                    return true;
+            }
+
+            return false;
         }
     }
 
@@ -77,8 +115,8 @@ public class ConcurrentPriorityQueue<T>
         {
             for (var i = 1; i <= _nrOfPriorities; i++)
             {
-                if (_queueMap.ContainsKey(i))
-                    _queueMap[i].Clear();
+                if (_queueTable.ContainsKey(i))
+                    _queueTable[i].Clear();
             }
         }
     }
@@ -92,8 +130,8 @@ public class ConcurrentPriorityQueue<T>
     {
         lock (_lock)
         {
-            if (_queueMap.ContainsKey(prio))
-                return new LinkedList<T>(_queueMap[prio]);
+            if (_queueTable.ContainsKey(prio))
+                return new LinkedList<T>(_queueTable[prio]);
 
             return null;
         }
@@ -110,8 +148,8 @@ public class ConcurrentPriorityQueue<T>
         {
             AdjustPriority(ref priority);
 
-            if (_queueMap.ContainsKey(priority))
-                _queueMap[priority].AddLast(item);
+            if (_queueTable.ContainsKey(priority))
+                _queueTable[priority].AddLast(item);
         }
     }
 
@@ -125,10 +163,10 @@ public class ConcurrentPriorityQueue<T>
         {
             for (var i = 1; i <= _nrOfPriorities; i++)
             {
-                if (_queueMap.ContainsKey(i) && _queueMap[i].Count != 0)
+                if (_queueTable.ContainsKey(i) && _queueTable[i].Count != 0)
                 {
-                    var node = _queueMap[i].First;
-                    _queueMap[i].RemoveFirst();
+                    var node = _queueTable[i].First;
+                    _queueTable[i].RemoveFirst();
 
                     return node.Value;
                 }

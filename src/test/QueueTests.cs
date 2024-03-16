@@ -130,6 +130,13 @@ namespace ConcurrentDataStructures.Tests
 
             Assert.Equal(0, queue.Count);
 
+            item = r.NextDouble() * 100;
+            queue.Enqueue(item);
+
+            Assert.True(queue.Contains(item));
+
+            queue.Remove(item);
+            Assert.Equal(0, queue.Count);
         }
     }
 }
