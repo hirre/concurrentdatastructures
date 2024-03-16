@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace ConcurrentDataStructure;
+namespace ConcurrentDataStructures;
 
 /// <summary>
 ///     A concurrent FIFO priority queue.

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace ConcurrentDataStructure
+namespace ConcurrentDataStructures
 {
     /// <summary>
     ///     A simple concurrent linked list implementation based on .NET LinkedList.

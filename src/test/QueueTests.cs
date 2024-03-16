@@ -1,6 +1,6 @@
 using Xunit.Abstractions;
 
-namespace ConcurrentDataStructure.Tests
+namespace ConcurrentDataStructures.Tests
 {
     public class QueueTests
     {
