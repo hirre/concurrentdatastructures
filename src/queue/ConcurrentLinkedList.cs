@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace queue
+namespace ConcurrentDataStructure
 {
     /// <summary>
     ///     A simple concurrent linked list implementation based on .NET LinkedList.
@@ -8,8 +8,8 @@ namespace queue
     /// <typeparam name="T"></typeparam>
     public class ConcurrentLinkedList<T> : IEnumerable<T>
     {
-        private readonly LinkedList<T> _linkedList = new LinkedList<T>();
-        private readonly object _listLock = new object();
+        private readonly LinkedList<T> _linkedList = new();
+        private readonly object _listLock = new();
 
         /// <summary>
         ///     Gets the number of items in the list.
