@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "queue", "queue\queue.csproj", "{A3CC5D1B-C7A3-4589-8846-1E96C23E9BF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "concurrentdatastructures", "queue\concurrentdatastructures.csproj", "{A3CC5D1B-C7A3-4589-8846-1E96C23E9BF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{AB82674D-DFFD-455B-82E8-D9073F0D5FD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test", "test\test.csproj", "{AB82674D-DFFD-455B-82E8-D9073F0D5FD2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
