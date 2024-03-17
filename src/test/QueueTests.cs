@@ -138,10 +138,10 @@ namespace ConcurrentDataStructures.Tests
             queue.Remove(item);
             Assert.Equal(0, queue.Count);
 
-            queue.Enqueue(r.NextDouble() * 100, 4);
-            queue.Enqueue(r.NextDouble() * 100, 55);
+            queue.Enqueue(78, 4);
+            queue.Enqueue(89, 55);
             queue.Enqueue(1337, 77);
-            queue.Enqueue(r.NextDouble() * 100, 99);
+            queue.Enqueue(345, 99);
 
             Assert.Equal(4, queue.Count);
 
@@ -155,12 +155,19 @@ namespace ConcurrentDataStructures.Tests
 
             queue.Dequeue();
 
+            Assert.Equal(89, queue.First);
+
             Assert.Equal(2, queue.Count);
 
             queue.Dequeue();
+
+            Assert.Equal(345, queue.First);
+
             queue.Dequeue();
 
             Assert.Equal(0, queue.Count); // Queue empty
+
+            Assert.Equal(default, queue.First);
         }
     }
 }

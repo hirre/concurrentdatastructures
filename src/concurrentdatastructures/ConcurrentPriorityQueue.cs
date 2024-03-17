@@ -73,6 +73,23 @@ public class ConcurrentPriorityQueue<T>
     }
 
     /// <summary>
+    ///     Get first item in queue.
+    /// </summary>
+    public T? First
+    {
+        get
+        {
+            lock (_lock)
+            {
+                if (_queueTable.ContainsKey(_headPrio) && _queueTable[_headPrio].Count == 0)
+                    AdjustHeadPrio();
+
+                return _queueTable[_headPrio].First != null ? _queueTable[_headPrio].First.Value : default;
+            }
+        }
+    }
+
+    /// <summary>
     ///     Remote an item from the queue.
     /// </summary>
     /// <param name="item">The item</param>
