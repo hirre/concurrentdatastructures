@@ -13,16 +13,16 @@ namespace ConcurrentDataStructures.Tests
 
         [Theory]
         [InlineData(1, 1_000)]
-        [InlineData(45, 1_000)]
+        [InlineData(50, 1_000)]
         [InlineData(999, 1_000)]
         [InlineData(1, 100_000)]
-        [InlineData(45, 100_000)]
+        [InlineData(50, 100_000)]
         [InlineData(999, 100_000)]
         [InlineData(1, 1_000_000)]
-        [InlineData(45, 1_000_000)]
+        [InlineData(50, 1_000_000)]
         [InlineData(999, 1_000_000)]
         [InlineData(1, 10_000_000)]
-        [InlineData(45, 10_000_000)]
+        [InlineData(50, 10_000_000)]
         [InlineData(999, 10_000_000)]
         public void TestQueuePerformance(int nrOfPrios, int nrOfQueueItems)
         {
