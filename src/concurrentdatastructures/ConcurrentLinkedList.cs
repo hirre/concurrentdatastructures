@@ -28,7 +28,7 @@ namespace ConcurrentDataStructures
         /// <summary>
         ///     Gets the first node in the list.
         /// </summary>
-        public LinkedListNode<T> First
+        public LinkedListNode<T>? First
         {
             get
             {
@@ -42,7 +42,7 @@ namespace ConcurrentDataStructures
         /// <summary>
         ///     Gets the last node in the list.
         /// </summary>
-        public LinkedListNode<T> Last
+        public LinkedListNode<T>? Last
         {
             get
             {
@@ -157,7 +157,7 @@ namespace ConcurrentDataStructures
         /// </summary>
         /// <param name="obj">Item</param>
         /// <returns>The node in the list that contains the specific value</returns>
-        public LinkedListNode<T> Find(T obj)
+        public LinkedListNode<T>? Find(T obj)
         {
             lock (_listLock)
             {
@@ -170,7 +170,7 @@ namespace ConcurrentDataStructures
         /// </summary>
         /// <param name="obj">Item</param>
         /// <returns>The node in the list that contains the specific value</returns>
-        public LinkedListNode<T> FindLast(T obj)
+        public LinkedListNode<T>? FindLast(T obj)
         {
             lock (_listLock)
             {
