@@ -5,7 +5,7 @@ namespace ConcurrentDataStructures;
 /// <summary>
 ///     A concurrent FIFO priority queue.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Type parameter</typeparam>
 public class ConcurrentPriorityQueue<T>
 {
     private const int MIN_NR_PRIO = 3;
@@ -14,6 +14,7 @@ public class ConcurrentPriorityQueue<T>
     private readonly object _lock = new();
     private readonly int _nrOfPriorities;
     private int _headPrio = int.MaxValue;
+    private int _tailPrio = int.MinValue;
     private ConcurrentDictionary<int, ConcurrentLinkedList<T>> _queueTable;
 
     /// <summary>
@@ -81,10 +82,33 @@ public class ConcurrentPriorityQueue<T>
         {
             lock (_lock)
             {
+                if (!_queueTable.ContainsKey(_headPrio))
+                    AdjustHeadPrio();
+
                 if (_queueTable.ContainsKey(_headPrio) && _queueTable[_headPrio].Count == 0)
                     AdjustHeadPrio();
 
-                return _queueTable[_headPrio].First != null ? _queueTable[_headPrio].First.Value : default;
+                return _queueTable.ContainsKey(_headPrio) && _queueTable[_headPrio].First != null ? _queueTable[_headPrio].First.Value : default;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Get last item in queue.
+    /// </summary>
+    public T? Last
+    {
+        get
+        {
+            lock (_lock)
+            {
+                if (!_queueTable.ContainsKey(_tailPrio))
+                    AdjustTailPrio();
+
+                if (_queueTable.ContainsKey(_tailPrio) && _queueTable[_tailPrio].Count == 0)
+                    AdjustTailPrio();
+
+                return _queueTable.ContainsKey(_tailPrio) && _queueTable[_tailPrio].Last != null ? _queueTable[_tailPrio].Last.Value : default;
             }
         }
     }
@@ -172,6 +196,9 @@ public class ConcurrentPriorityQueue<T>
             if (priority < _headPrio)
                 _headPrio = priority;
 
+            if (priority > _tailPrio)
+                _tailPrio = priority;
+
             if (_queueTable.ContainsKey(priority))
                 _queueTable[priority].AddLast(item);
         }
@@ -190,12 +217,20 @@ public class ConcurrentPriorityQueue<T>
                 if (_queueTable[_headPrio].Count == 0)
                     AdjustHeadPrio();
 
+                if (_queueTable[_tailPrio].Count == 0)
+                    AdjustTailPrio();
+
                 if (_queueTable[_headPrio].Count != 0)
                 {
                     var node = _queueTable[_headPrio].First;
-                    _queueTable[_headPrio].RemoveFirst();
 
-                    return node.Value;
+                    if (node != null)
+                    {
+                        _queueTable[_headPrio].RemoveFirst();
+                        return node.Value;
+                    }
+
+                    return default;
                 }
             }
 
@@ -213,6 +248,21 @@ public class ConcurrentPriorityQueue<T>
             if (_queueTable.ContainsKey(i) && _queueTable[i].Count != 0)
             {
                 _headPrio = i;
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Adjusts the tail prio to the "lowest possible".
+    /// </summary>
+    private void AdjustTailPrio()
+    {
+        for (var i = NrOfPriorities; i >= 1; i--)
+        {
+            if (_queueTable.ContainsKey(i) && _queueTable[i].Count != 0)
+            {
+                _tailPrio = i;
                 return;
             }
         }

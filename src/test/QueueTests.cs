@@ -156,18 +156,34 @@ namespace ConcurrentDataStructures.Tests
             queue.Dequeue();
 
             Assert.Equal(89, queue.First);
+            Assert.Equal(345, queue.Last);
 
             Assert.Equal(2, queue.Count);
 
             queue.Dequeue();
 
             Assert.Equal(345, queue.First);
+            Assert.Equal(345, queue.Last);
 
             queue.Dequeue();
 
             Assert.Equal(0, queue.Count); // Queue empty
 
             Assert.Equal(default, queue.First);
+            Assert.Equal(default, queue.Last);
+
+            // Enqueue 3 items prio 1
+            queue.Enqueue(11, 1);
+            queue.Enqueue(22, 0);
+            queue.Enqueue(33, -22);
+
+            Assert.Equal(11, queue.First);
+            Assert.Equal(33, queue.Last);
+
+            queue.Clear(); // Clear queue
+
+            Assert.Equal(default, queue.First);
+            Assert.Equal(default, queue.Last);
         }
     }
 }
