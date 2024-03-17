@@ -8,20 +8,24 @@ namespace ConcurrentDataStructures;
 /// <typeparam name="T"></typeparam>
 public class ConcurrentPriorityQueue<T>
 {
+    private const int MIN_NR_PRIO = 3;
+    private const int MAX_NR_PRIO = 99;
+
     private readonly object _lock = new();
     private readonly int _nrOfPriorities;
+    private int _headPrio = int.MaxValue;
     private ConcurrentDictionary<int, ConcurrentLinkedList<T>> _queueTable;
 
     /// <summary>
     ///     Creates a concurrent FIFO priority queue.
     /// </summary>
-    /// <param name="nrOfPriorities">Number of available priorities, higher priority = lower number and vice versa (min 3, max 99)</param>
-    public ConcurrentPriorityQueue(int nrOfPriorities = 3)
+    /// <param name="nrOfPriorities">Number of available priorities, higher priority = lower number and vice versa (min MIN_NR_PRIO, max MAX_NR_PRIO)</param>
+    public ConcurrentPriorityQueue(int nrOfPriorities = MIN_NR_PRIO)
     {
-        if (nrOfPriorities < 3)
-            nrOfPriorities = 3;
-        else if (nrOfPriorities > 99)
-            nrOfPriorities = 99;
+        if (nrOfPriorities < MIN_NR_PRIO)
+            nrOfPriorities = MIN_NR_PRIO;
+        else if (nrOfPriorities > MAX_NR_PRIO)
+            nrOfPriorities = MAX_NR_PRIO;
 
         _queueTable = new ConcurrentDictionary<int, ConcurrentLinkedList<T>>();
         _nrOfPriorities = nrOfPriorities;
@@ -57,7 +61,7 @@ public class ConcurrentPriorityQueue<T>
             {
                 var count = 0;
 
-                for (var i = 1; i <= _nrOfPriorities; i++)
+                for (var i = _headPrio; i <= _nrOfPriorities; i++)
                 {
                     if (_queueTable.ContainsKey(i))
                         count += _queueTable[i].Count;
@@ -77,7 +81,7 @@ public class ConcurrentPriorityQueue<T>
     {
         lock (_lock)
         {
-            for (var i = 1; i <= _nrOfPriorities; i++)
+            for (var i = _headPrio; i <= _nrOfPriorities; i++)
             {
                 if (_queueTable.ContainsKey(i) && _queueTable[i].Remove(item))
                     return true;
@@ -96,7 +100,7 @@ public class ConcurrentPriorityQueue<T>
     {
         lock (_lock)
         {
-            for (var i = 1; i <= _nrOfPriorities; i++)
+            for (var i = _headPrio; i <= _nrOfPriorities; i++)
             {
                 if (_queueTable.ContainsKey(i) && _queueTable[i].Contains(item))
                     return true;
@@ -113,7 +117,7 @@ public class ConcurrentPriorityQueue<T>
     {
         lock (_lock)
         {
-            for (var i = 1; i <= _nrOfPriorities; i++)
+            for (var i = _headPrio; i <= _nrOfPriorities; i++)
             {
                 if (_queueTable.ContainsKey(i))
                     _queueTable[i].Clear();
@@ -148,6 +152,9 @@ public class ConcurrentPriorityQueue<T>
         {
             AdjustPriority(ref priority);
 
+            if (priority < _headPrio)
+                _headPrio = priority;
+
             if (_queueTable.ContainsKey(priority))
                 _queueTable[priority].AddLast(item);
         }
@@ -161,12 +168,15 @@ public class ConcurrentPriorityQueue<T>
     {
         lock (_lock)
         {
-            for (var i = 1; i <= _nrOfPriorities; i++)
+            if (_queueTable.ContainsKey(_headPrio))
             {
-                if (_queueTable.ContainsKey(i) && _queueTable[i].Count != 0)
+                if (_queueTable[_headPrio].Count == 0)
+                    AdjustHeadPrio();
+
+                if (_queueTable[_headPrio].Count != 0)
                 {
-                    var node = _queueTable[i].First;
-                    _queueTable[i].RemoveFirst();
+                    var node = _queueTable[_headPrio].First;
+                    _queueTable[_headPrio].RemoveFirst();
 
                     return node.Value;
                 }
@@ -177,9 +187,24 @@ public class ConcurrentPriorityQueue<T>
     }
 
     /// <summary>
+    ///     Adjusts the head prio to the "highest possible".
+    /// </summary>
+    private void AdjustHeadPrio()
+    {
+        for (var i = _headPrio; i <= NrOfPriorities; i++)
+        {
+            if (_queueTable.ContainsKey(i) && _queueTable[i].Count != 0)
+            {
+                _headPrio = i;
+                return;
+            }
+        }
+    }
+
+    /// <summary>
     ///     Adjust priority.
     /// </summary>
-    /// <param name="prio"></param>
+    /// <param name="prio">Wanted priority</param>
     private void AdjustPriority(ref int prio)
     {
         if (prio < 1)
