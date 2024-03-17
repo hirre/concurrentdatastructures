@@ -137,6 +137,30 @@ namespace ConcurrentDataStructures.Tests
 
             queue.Remove(item);
             Assert.Equal(0, queue.Count);
+
+            queue.Enqueue(r.NextDouble() * 100, 4);
+            queue.Enqueue(r.NextDouble() * 100, 55);
+            queue.Enqueue(1337, 77);
+            queue.Enqueue(r.NextDouble() * 100, 99);
+
+            Assert.Equal(4, queue.Count);
+
+            Assert.True(queue.Contains(1337));
+
+            queue.Remove(1337);
+
+            Assert.False(queue.Contains(1337));
+
+            Assert.Equal(3, queue.Count);
+
+            queue.Dequeue();
+
+            Assert.Equal(2, queue.Count);
+
+            queue.Dequeue();
+            queue.Dequeue();
+
+            Assert.Equal(0, queue.Count); // Queue empty
         }
     }
 }
